@@ -1,0 +1,20 @@
+{
+    "knife": {
+      "risk_level": "high",
+      "target_group": "children_2_6",
+      "reason": "Kesici bir nesne olduğu için ciddi yaralanma riski oluşturur.",
+      "recommendation": "Bıçağı çocuğun erişemeyeceği kilitli veya yüksek bir alanda saklayın."
+    },
+    "scissors": {
+      "risk_level": "high",
+      "target_group": "children_2_6",
+      "reason": "Keskin uçları nedeniyle yaralanma riski oluşturur.",
+      "recommendation": "Makası kapalı ve çocuğun erişemeyeceği bir yerde saklayın."
+    },
+    "chair": {
+      "risk_level": "medium",
+      "target_group": "children_2_6",
+      "reason": "Çocuk sandalyeye tırmanarak düşebilir veya yüksek alanlara ulaşabilir.",
+      "recommendation": "Sandalyeyi pencere, balkon ve tezgâh gibi tehlikeli alanlardan uzak tutun."
+    }
+  }
