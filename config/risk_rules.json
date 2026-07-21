@@ -1,20 +1,38 @@
 {
-    "knife": {
+  "target_group": "children_2_6",
+  "rules": [
+    {
+      "id": "sharp_object_knife",
+      "labels": [
+        "knife",
+        "kitchen knife",
+        "bread knife",
+        "cleaver"
+      ],
       "risk_level": "high",
-      "target_group": "children_2_6",
-      "reason": "Kesici bir nesne olduğu için ciddi yaralanma riski oluşturur.",
-      "recommendation": "Bıçağı çocuğun erişemeyeceği kilitli veya yüksek bir alanda saklayın."
+      "risk_score": 90,
+      "reason": "Kesici nesne, 2–6 yaş arasındaki çocuklarda ciddi kesik ve yaralanma riski oluşturur.",
+      "recommendation": "Bıçağı çocuğun erişemeyeceği, kapalı veya kilitli bir dolapta saklayın."
     },
-    "scissors": {
+    {
+      "id": "sharp_object_scissors",
+      "labels": [
+        "scissors",
+        "pair of scissors"
+      ],
       "risk_level": "high",
-      "target_group": "children_2_6",
-      "reason": "Keskin uçları nedeniyle yaralanma riski oluşturur.",
-      "recommendation": "Makası kapalı ve çocuğun erişemeyeceği bir yerde saklayın."
+      "risk_score": 85,
+      "reason": "Makas, çocuk tarafından kontrolsüz kullanıldığında kesik ve göz yaralanması riski oluşturur.",
+      "recommendation": "Makası yüksek veya kilitli bir saklama alanına kaldırın."
     },
-    "chair": {
+    {
+      "id": "unstable_chair",
+      "labels": [
+        "chair",
+        "stool"
+      ],
       "risk_level": "medium",
-      "target_group": "children_2_6",
-      "reason": "Çocuk sandalyeye tırmanarak düşebilir veya yüksek alanlara ulaşabilir.",
-      "recommendation": "Sandalyeyi pencere, balkon ve tezgâh gibi tehlikeli alanlardan uzak tutun."
-    }
-  }
+      "risk_score": 55,
+      "reason": "Çocuk sandalyeye tırmanabilir veya sandalyeyi devirerek düşme riski yaşayabilir.",
+      "recommendation": "Sandalyenin dengeli olduğundan emin olun ve tehlikeli alanlara eriş"
+    }]}
