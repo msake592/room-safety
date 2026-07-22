@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import logging
 import sys
 import types
 from pathlib import Path
@@ -143,7 +144,12 @@ def test_analyze_rejects_unsupported_content_type(
     )
 
     assert response.status_code == 400
-    assert "Desteklenmeyen dosya türü" in response.json()["detail"]
+    assert response.json() == {
+        "error": {
+            "code": "UNSUPPORTED_MEDIA_TYPE",
+            "message": "Yalnızca JPEG ve PNG görseller desteklenmektedir.",
+        }
+    }
     assert mocked_analysis_service.calls == []
 
 
@@ -157,7 +163,12 @@ def test_analyze_rejects_corrupt_image(
     )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Görsel içeriği okunamadı."
+    assert response.json() == {
+        "error": {
+            "code": "INVALID_IMAGE",
+            "message": "Görsel içeriği okunamadı.",
+        }
+    }
     assert mocked_analysis_service.calls == []
 
 
@@ -174,33 +185,44 @@ def test_analyze_rejects_upload_over_size_limit(
     )
 
     assert response.status_code == 413
-    assert "10 MB" in response.json()["detail"]
+    assert response.json() == {
+        "error": {
+            "code": "FILE_TOO_LARGE",
+            "message": "Dosya boyutu 10 MB sınırını aşıyor.",
+        }
+    }
     assert mocked_analysis_service.calls == []
 
 
 def test_analyze_hides_unexpected_service_errors(
     client: TestClient,
     monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     mock = AnalyzeImageMock(error=RuntimeError("secret model failure"))
     module = types.ModuleType("app.services.image_analysis_service")
     module.analyze_image = mock
     monkeypatch.setitem(sys.modules, "app.services.image_analysis_service", module)
 
-    response = client.post(
-        "/analyze",
-        files={
-            "image": (
-                "room.jpg",
-                make_image_bytes("JPEG"),
-                "image/jpeg",
-            )
-        },
-    )
+    with caplog.at_level(logging.ERROR, logger="app.main"):
+        response = client.post(
+            "/analyze",
+            files={
+                "image": (
+                    "room.jpg",
+                    make_image_bytes("JPEG"),
+                    "image/jpeg",
+                )
+            },
+        )
 
     assert response.status_code == 500
     assert response.json() == {
-        "detail": "Görsel analizi sırasında beklenmeyen bir hata oluştu."
+        "error": {
+            "code": "ANALYSIS_FAILED",
+            "message": "Görsel analizi sırasında beklenmeyen bir hata oluştu.",
+        }
     }
     assert "secret model failure" not in response.text
     assert len(mock.calls) == 1
+    assert "analysis failed" in caplog.text
