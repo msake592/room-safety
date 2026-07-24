@@ -211,3 +211,7 @@ This project uses the following open-source models:
 - FastAPI
 - Hugging Face Transformers
 - PyTorch
+
+  <img width="965" height="446" alt="test" src="https://github.com/user-attachments/assets/381bcbb4-009e-4e61-b381-06dd9cfdc1b5" />
+<img width="965" height="446" alt="image" src="https://github.com/user-attachments/assets/4de2ab2b-6805-47ca-be5c-d9b4ee2ae3e3" />
+
