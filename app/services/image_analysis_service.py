@@ -18,13 +18,14 @@ from transformers import (
     Sam2Processor,
 )
 
+from app.config import build_grounding_dino_prompt
 from app.risk_engine.engine import RiskEngine
 
 
 GROUNDING_MODEL_ID = "IDEA-Research/grounding-dino-tiny"
 SAM2_MODEL_ID = "facebook/sam2.1-hiera-tiny"
 
-DEFAULT_TEXT_PROMPT = "knife."
+DEFAULT_TEXT_PROMPT = build_grounding_dino_prompt()
 DEFAULT_BOX_THRESHOLD = 0.20
 DEFAULT_TEXT_THRESHOLD = 0.10
 DEFAULT_MIN_SCORE = 0.30

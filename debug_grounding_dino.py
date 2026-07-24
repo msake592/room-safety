@@ -7,6 +7,8 @@ from transformers import (
     AutoProcessor,
 )
 
+from app.config import build_grounding_dino_prompt
+
 MODEL_ID = "IDEA-Research/grounding-dino-tiny"
 IMAGE_PATH = Path("test-images/room.jpg")
 
@@ -30,7 +32,7 @@ model.to(device)
 model.eval()
 
 # Grounding DINO'da noktayla ayrılmış açıklama kullanmak daha güvenlidir.
-text = "knife. kitchen knife. cleaver. bread knife."
+text = build_grounding_dino_prompt()
 
 inputs = processor(
     images=image,

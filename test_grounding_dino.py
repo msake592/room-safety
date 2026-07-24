@@ -4,6 +4,8 @@ import torch
 from PIL import Image, ImageDraw
 from transformers import pipeline
 
+from app.config import DANGEROUS_OBJECT_LABELS
+
 
 def resolve_device() -> str:
     if torch.backends.mps.is_available():
@@ -28,26 +30,9 @@ pipe = pipeline(
 
 image = Image.open(image_path).convert("RGB")
 
-candidate_labels = [
-   "knife",
-
-    "kitchen knife",
-
-    "sharp knife",
-
-    "electrical outlet",
-
-    "power outlet",
-
-    "wall socket",
-
-    "electrical socket",
-    "plug",
-]
-
 results = pipe(
     image,
-    candidate_labels=candidate_labels,
+    candidate_labels=list(DANGEROUS_OBJECT_LABELS),
     threshold=0.40,
 )
 
