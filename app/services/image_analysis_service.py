@@ -20,6 +20,7 @@ from transformers import (
 
 from app.config import build_grounding_dino_prompt
 from app.risk_engine.engine import RiskEngine
+from app.risk_engine.labels import describe_hazard_label
 
 
 GROUNDING_MODEL_ID = "IDEA-Research/grounding-dino-tiny"
@@ -414,9 +415,17 @@ def build_risk_detections(
     detections = []
 
     for box, score, label in zip(boxes, scores, labels):
+        normalized_label = describe_hazard_label(str(label))
+
+        if normalized_label is None:
+            continue
+
         detections.append(
             {
                 "label": str(label),
+                "raw_label": normalized_label.raw_label,
+                "canonical_label": normalized_label.canonical_label,
+                "display_label": normalized_label.display_label,
                 "score": float(score),
                 "box": [float(value) for value in box],
             }

@@ -52,6 +52,7 @@ class AnalyzeImageMock:
                 }
             ],
             "result_image_path": "/tmp/result.jpg",
+            "result_image_url": "/analysis-results/test/result.jpg",
         }
         self.error = error
         self.calls: list[dict] = []
@@ -104,6 +105,7 @@ def test_analyze_accepts_valid_jpeg(
     assert response.status_code == 200
     assert response.json()["detection_count"] == 1
     assert response.json()["detections"][0]["label"] == "knife"
+    assert response.json()["result_image_url"].startswith("/analysis-results/")
     assert len(mocked_analysis_service.calls) == 1
 
     call = mocked_analysis_service.calls[0]
@@ -132,6 +134,31 @@ def test_analyze_accepts_valid_png(
     assert response.status_code == 200
     assert response.json()["result_image_path"] == "/tmp/result.jpg"
     assert len(mocked_analysis_service.calls) == 1
+
+
+def test_result_image_endpoint_serves_generated_image(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    outputs_root = tmp_path / "outputs" / "api"
+    request_dir = outputs_root / "abc123"
+    request_dir.mkdir(parents=True)
+    result_image = request_dir / "result.jpg"
+    result_image.write_bytes(make_image_bytes("JPEG"))
+    monkeypatch.setattr(api, "get_api_outputs_root", lambda: outputs_root)
+
+    response = client.get("/analysis-results/abc123/result.jpg")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.content == result_image.read_bytes()
+
+
+def test_result_image_endpoint_rejects_path_traversal(client: TestClient) -> None:
+    response = client.get("/analysis-results/..%2Fsecret/result.jpg")
+
+    assert response.status_code == 404
 
 
 def test_analyze_rejects_unsupported_content_type(

@@ -28,6 +28,9 @@ class HealthResponse(BaseModel):
 
 class DetectionResponse(BaseModel):
     label: str
+    raw_label: str | None = None
+    canonical_label: str | None = None
+    display_label: str | None = None
     score: float
     box: list[float]
 
@@ -53,6 +56,7 @@ class AnalysisResponse(BaseModel):
     risk_count: int | None = None
     risks: list[RiskResponse]
     result_image_path: str
+    result_image_url: str | None = None
     risk_analysis_path: str | None = None
     boxed_image_path: str | None = None
 
