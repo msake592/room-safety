@@ -26,6 +26,36 @@
       "recommendation": "Makası yüksek veya kilitli bir saklama alanına kaldırın."
     },
     {
+      "id": "electrical_outlet_access",
+      "labels": [
+        "electrical_outlet"
+      ],
+      "risk_level": "high",
+      "risk_score": 80,
+      "reason": "Açık veya erişilebilir prizler, 2–6 yaş arasındaki çocuklarda elektrik çarpması riski oluşturur.",
+      "recommendation": "Prizleri çocuk korumalı kapaklarla kapatın ve kabloları çocuğun erişemeyeceği şekilde düzenleyin."
+    },
+    {
+      "id": "medicine_access",
+      "labels": [
+        "medicine_bottle"
+      ],
+      "risk_level": "high",
+      "risk_score": 95,
+      "reason": "İlaçlar çocuk tarafından yutulursa zehirlenme veya ciddi sağlık riski oluşturabilir.",
+      "recommendation": "İlaçları çocuk kilitli, yüksek ve kapalı bir dolapta saklayın."
+    },
+    {
+      "id": "chemical_product_access",
+      "labels": [
+        "detergent_bottle"
+      ],
+      "risk_level": "high",
+      "risk_score": 90,
+      "reason": "Temizlik ürünleri yutulduğunda veya çocukla temas ettiğinde zehirlenme veya tahriş riski oluşturabilir.",
+      "recommendation": "Temizlik ve kimyasal ürünleri orijinal ambalajında, kilitli ve çocukların erişemeyeceği bir yerde saklayın."
+    },
+    {
       "id": "unstable_chair",
       "labels": [
         "chair",

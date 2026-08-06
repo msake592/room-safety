@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from app.risk_engine.labels import describe_hazard_label, normalize_hazard_label
+
 
 class RiskEngine:
     def __init__(self, rules_path: str = "config/risk_rules.json"):
@@ -45,7 +47,12 @@ class RiskEngine:
 
     @staticmethod
     def _normalize_label(label: str) -> str:
-        return label.lower().strip().rstrip(".")
+        normalized_label = normalize_hazard_label(label)
+
+        if normalized_label is None:
+            return ""
+
+        return normalized_label
 
     def _find_matching_rule(self, detection_label: str) -> dict | None:
         normalized_detection_label = self._normalize_label(
@@ -77,6 +84,11 @@ class RiskEngine:
             if not isinstance(label, str) or not label.strip():
                 continue
 
+            normalized_label = describe_hazard_label(label)
+
+            if normalized_label is None:
+                continue
+
             rule = self._find_matching_rule(label)
 
             if rule is None:
@@ -85,6 +97,9 @@ class RiskEngine:
             results.append(
                 {
                     **detection,
+                    "raw_label": detection.get("raw_label", normalized_label.raw_label),
+                    "canonical_label": normalized_label.canonical_label,
+                    "display_label": normalized_label.display_label,
                     "rule_id": rule.get("id"),
                     "risk_level": rule["risk_level"],
                     "risk_score": rule.get("risk_score"),

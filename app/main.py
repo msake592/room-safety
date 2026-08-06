@@ -8,6 +8,8 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
 
@@ -34,6 +36,17 @@ SUPPORTED_IMAGE_CONTENT_TYPES = {
 
 app = FastAPI(title="Room Safety API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.exception_handler(ApiError)
 def handle_api_error(_, error: ApiError) -> JSONResponse:
@@ -56,6 +69,44 @@ def get_repo_root() -> Path:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return {"status": "ok"}
+
+
+def get_api_outputs_root() -> Path:
+    return get_repo_root() / "outputs" / "api"
+
+
+def get_result_image_url(request_id: str) -> str:
+    return f"/analysis-results/{request_id}/result.jpg"
+
+
+@app.get("/analysis-results/{request_id}/result.jpg")
+def get_analysis_result_image(request_id: str) -> FileResponse:
+    if not request_id.isalnum():
+        raise ApiError(
+            status_code=400,
+            code=ErrorCode.INVALID_IMAGE,
+            message="Sonuç görseli bulunamadı.",
+        )
+
+    result_image_path = get_api_outputs_root() / request_id / "result.jpg"
+
+    try:
+        result_image_path.resolve().relative_to(get_api_outputs_root().resolve())
+    except ValueError as error:
+        raise ApiError(
+            status_code=400,
+            code=ErrorCode.INVALID_IMAGE,
+            message="Sonuç görseli bulunamadı.",
+        ) from error
+
+    if not result_image_path.is_file():
+        raise ApiError(
+            status_code=404,
+            code=ErrorCode.INVALID_IMAGE,
+            message="Sonuç görseli bulunamadı.",
+        )
+
+    return FileResponse(result_image_path, media_type="image/jpeg")
 
 
 def save_upload_to_temp_file(upload: UploadFile) -> Path:
@@ -125,7 +176,7 @@ def analyze(image: UploadFile = File(...)) -> dict:
     temp_image_path: Path | None = None
     request_id = uuid.uuid4().hex
     repo_root = get_repo_root()
-    output_directory = repo_root / "outputs" / "api" / request_id
+    output_directory = get_api_outputs_root() / request_id
     result_image_path = output_directory / "result.jpg"
     request_start = time.perf_counter()
     uploaded_size = 0
@@ -148,6 +199,7 @@ def analyze(image: UploadFile = File(...)) -> dict:
             output_directory=output_directory,
             result_image_path=result_image_path,
         )
+        result["result_image_url"] = get_result_image_url(request_id)
 
         elapsed = time.perf_counter() - request_start
         logger.info(
