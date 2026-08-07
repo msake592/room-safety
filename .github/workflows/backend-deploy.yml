@@ -1,0 +1,32 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  auth-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/148673826192/locations/global/workloadIdentityPools/room-safety-github-pool/providers/github-provider
+          service_account: github-actions@room-safety-msk-2026.iam.gserviceaccount.com
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify authentication
+        run: |
+          gcloud auth list
+          gcloud config get-value project
